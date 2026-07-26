@@ -1259,7 +1259,7 @@ function calculateUnitsPerVillage(troopsAllowed) {
                             unitsReadyForSend[j][unit] = troopsAllowed[unit];
                             troopsAllowed[unit] = 0;
                         } else {
-                            const troopAmmount = (reach / ratioValue) * troopProportions[unit]
+                            const troopAmmount = Math.low((reach / ratioValue) * troopProportions[unit])
                             unitsReadyForSend[j][unit] = troopAmmount
                         }
                     }
