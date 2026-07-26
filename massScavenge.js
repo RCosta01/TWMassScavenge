@@ -1228,9 +1228,23 @@ function calculateUnitsPerVillage(troopsAllowed) {
         if (version != "old") {
             for (var j = 3; j >= 0; j--) {
                 var reach = haulCategoryRate[j + 1];
+                let remaining = reach;
+                let haulCapacity = 0; // total capacity
+                let haulCapacityTypes = {} // capacity per unit type
+                let troopProportions = {} // proportions of each unit
+                let ratioValue = 0;
+                let haulPerType = {} // what each type should send
+                const totalTroops = Object.values(troopsAllowed).reduce((a, b) => a + b, 0);
+                sendOrder.forEach((unit) => {
+                    if(troopsAllowed.hasOwnProperty(unit)){
+                        troopProportions[unit] = troopsAllowed[unit] / totalTroops
+                        ratioValue += troopProportions[unit] * unitHaul[unit]
+                        haulCapacity += troopsAllowed[unit] * unitHaul[unit]
+                    }
+                })
                 sendOrder.forEach((unit) => {
                     if (troopsAllowed.hasOwnProperty(unit) && reach > 0) {
-                        var amountNeeded = Math.floor(reach / unitHaul[unit]);
+                        /*var amountNeeded = Math.floor(reach / unitHaul[unit]);
 
                         if (amountNeeded > troopsAllowed[unit]) {
                             unitsReadyForSend[j][unit] = troopsAllowed[unit];
@@ -1240,6 +1254,13 @@ function calculateUnitsPerVillage(troopsAllowed) {
                             unitsReadyForSend[j][unit] = amountNeeded;
                             reach = 0;
                             troopsAllowed[unit] = troopsAllowed[unit] - amountNeeded;
+                        }*/
+                        if (reach >= haulCapacity) {
+                            unitsReadyForSend[j][unit] = troopsAllowed[unit];
+                            troopsAllowed[unit] = 0;
+                        } else {
+                            const troopAmmount = (reach / ratioValue) * troopProportions[unit]
+                            unitsReadyForSend[j][unit] = troopAmmount
                         }
                     }
                 });
